@@ -194,6 +194,16 @@ Commands:
         --shell=bash       Type of shell environment. Options include: bash, powershell, fish
 
 
+  eks-token [<flags>]
+    EKS (K8S) token will be created (usefull as a credential plugin).
+    
+        --cluster-name=CLUSTER_NAME  Name of the EKS cluster.
+        --exec-profile=EXEC-PROFILE
+                           The AWS profile to utilize for console execution. (env: SAML2AWS_EXEC_PROFILE)
+    -p, --profile=PROFILE  The AWS profile to save the temporary credentials. (env: SAML2AWS_PROFILE)
+        --force            Refresh credentials even if not expired.
+
+
 ```
 
 
@@ -390,6 +400,21 @@ region                  = us-east-1
 ```
 
 To use this you will need to export `AWS_DEFAULT_PROFILE=customer-test` environment variable to target `test`.
+
+### Using `saml2aws` as [credential plugin](https://kubernetes.io/docs/reference/access-authn-authz/authentication/#client-go-credential-plugins) for kubectl
+
+Edit kubectl config (`~/kube.config`), replace exec command by:
+
+```bash
+    exec:
+      apiVersion: client.authentication.k8s.io/v1alpha1
+      args:
+      - eks-token
+      - --cluster-name
+      - CLUSTER_NAME
+      - --skip-prompt
+      command: saml2aws
+```
 
 ## Advanced Configuration (Multiple AWS account access but SAML authenticate against a single 'SSO' AWS account)
 

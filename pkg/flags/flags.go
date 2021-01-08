@@ -35,6 +35,7 @@ type LoginExecFlags struct {
 	Force        bool
 	DuoMFAOption string
 	ExecProfile  string
+	ClusterName  string
 }
 
 type ConsoleFlags struct {
