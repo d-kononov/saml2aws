@@ -64,6 +64,7 @@ func (kc *Client) Authenticate(loginDetails *creds.LoginDetails) (string, error)
 			return "", errors.Wrap(err, "unable to locate IDP totp form submit URL")
 		}
 
+		println("Please input TOTP code and hit enter")
 		doc, err = kc.postTotpForm(totpSubmitURL, loginDetails.MFAToken, doc)
 		if err != nil {
 			return "", errors.Wrap(err, "error posting totp form")
@@ -186,7 +187,7 @@ func extractSamlResponse(doc *goquery.Document) string {
 
 	doc.Find("input").Each(func(i int, s *goquery.Selection) {
 		name, ok := s.Attr("name")
-		if ( ok && name == "SAMLResponse" ) {
+		if ok && name == "SAMLResponse" {
 			val, ok := s.Attr("value")
 			if !ok {
 				log.Fatalf("unable to locate saml assertion value")
