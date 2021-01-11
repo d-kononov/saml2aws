@@ -77,7 +77,7 @@ func (ac *Client) Authenticate(loginDetails *creds.LoginDetails) (string, error)
 		}
 		switch mfaMethod {
 		case "token":
-			mfaToken = prompter.RequestSecurityCode("000000")
+			mfaToken = prompter.RequestSecurityCode("000000", false)
 		case "push":
 			mfaToken = ""
 		}

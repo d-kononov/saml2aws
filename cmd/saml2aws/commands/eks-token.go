@@ -3,6 +3,9 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/versent/saml2aws/v2/pkg/awsconfig"
@@ -63,9 +66,19 @@ func EksToken(configFlags *flags.LoginExecFlags) error {
 		return errors.Wrap(err, "failed to create token generator")
 	}
 
+	sess, err := session.NewSession(&aws.Config{
+		CredentialsChainVerboseErrors: aws.Bool(true),
+		Region:                        aws.String(awsCreds.Region),
+		Credentials:                   credentials.NewStaticCredentials(awsCreds.AWSAccessKey, awsCreds.AWSSecretKey, awsCreds.AWSSessionToken),
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to create aws session")
+	}
+
 	opts := &token.GetTokenOptions{
 		Region:    configFlags.CommonFlags.Region,
 		ClusterID: configFlags.ClusterName,
+		Session:   sess,
 	}
 	tok, err := gen.GetWithOptions(opts)
 	if err != nil {

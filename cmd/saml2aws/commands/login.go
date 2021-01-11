@@ -65,7 +65,9 @@ func Login(loginFlags *flags.LoginExecFlags) error {
 		return errors.Wrap(err, "error building IdP client")
 	}
 
-	log.Printf("Authenticating as %s ...", loginDetails.Username)
+	if !loginFlags.CommonFlags.Silent {
+		log.Printf("Authenticating as %s ...", loginDetails.Username)
+	}
 
 	samlAssertion, err := provider.Authenticate(loginDetails)
 	if err != nil {
@@ -91,15 +93,15 @@ func Login(loginFlags *flags.LoginExecFlags) error {
 	if err != nil {
 		return errors.Wrap(err, "Failed to assume role, please check whether you are permitted to assume the given role for the AWS service")
 	}
-
-	log.Println("Selected role:", role.RoleARN)
-
-	awsCreds, err := loginToStsUsingRole(account, role, samlAssertion)
+	if !loginFlags.CommonFlags.Silent {
+		log.Println("Selected role:", role.RoleARN)
+	}
+	awsCreds, err := loginToStsUsingRole(account, role, samlAssertion, loginFlags)
 	if err != nil {
 		return errors.Wrap(err, "error logging into aws role using saml assertion")
 	}
 
-	return saveCredentials(awsCreds, sharedCreds)
+	return saveCredentials(awsCreds, sharedCreds, loginFlags)
 }
 
 func buildIdpAccount(loginFlags *flags.LoginExecFlags) (*cfg.IDPAccount, error) {
@@ -130,8 +132,9 @@ func resolveLoginDetails(account *cfg.IDPAccount, loginFlags *flags.LoginExecFla
 
 	loginDetails := &creds.LoginDetails{URL: account.URL, Username: account.Username, MFAToken: loginFlags.CommonFlags.MFAToken, DuoMFAOption: loginFlags.DuoMFAOption}
 
-	log.Printf("Using IDP Account %s to access %s %s", loginFlags.CommonFlags.IdpAccount, account.Provider, account.URL)
-
+	if !loginFlags.CommonFlags.Silent {
+		log.Printf("Using IDP Account %s to access %s %s", loginFlags.CommonFlags.IdpAccount, account.Provider, account.URL)
+	}
 	var err error
 	if !loginFlags.CommonFlags.DisableKeychain {
 		err = credentials.LookupCredentials(loginDetails, account.Provider)
@@ -251,7 +254,7 @@ func resolveRole(awsRoles []*saml2aws.AWSRole, samlAssertion string, account *cf
 	return role, nil
 }
 
-func loginToStsUsingRole(account *cfg.IDPAccount, role *saml2aws.AWSRole, samlAssertion string) (*awsconfig.AWSCredentials, error) {
+func loginToStsUsingRole(account *cfg.IDPAccount, role *saml2aws.AWSRole, samlAssertion string, loginFlags *flags.LoginExecFlags) (*awsconfig.AWSCredentials, error) {
 
 	sess, err := session.NewSession(&aws.Config{
 		Region: &account.Region,
@@ -268,9 +271,9 @@ func loginToStsUsingRole(account *cfg.IDPAccount, role *saml2aws.AWSRole, samlAs
 		SAMLAssertion:   aws.String(samlAssertion),     // Required
 		DurationSeconds: aws.Int64(int64(account.SessionDuration)),
 	}
-
-	log.Println("Requesting AWS credentials using SAML assertion")
-
+	if !loginFlags.CommonFlags.Silent {
+		log.Println("Requesting AWS credentials using SAML assertion")
+	}
 	resp, err := svc.AssumeRoleWithSAML(params)
 	if err != nil {
 		return nil, errors.Wrap(err, "error retrieving STS credentials using SAML")
@@ -287,17 +290,17 @@ func loginToStsUsingRole(account *cfg.IDPAccount, role *saml2aws.AWSRole, samlAs
 	}, nil
 }
 
-func saveCredentials(awsCreds *awsconfig.AWSCredentials, sharedCreds *awsconfig.CredentialsProvider) error {
+func saveCredentials(awsCreds *awsconfig.AWSCredentials, sharedCreds *awsconfig.CredentialsProvider, loginFlags *flags.LoginExecFlags) error {
 	err := sharedCreds.Save(awsCreds)
 	if err != nil {
 		return errors.Wrap(err, "error saving credentials")
 	}
-
-	log.Println("Logged in as:", awsCreds.PrincipalARN)
-	log.Println("")
-	log.Println("Your new access key pair has been stored in the AWS configuration")
-	log.Printf("Note that it will expire at %v", awsCreds.Expires)
-	log.Println("To use this credential, call the AWS CLI with the --profile option (e.g. aws --profile", sharedCreds.Profile, "ec2 describe-instances).")
-
+	if !loginFlags.CommonFlags.Silent {
+		log.Println("Logged in as:", awsCreds.PrincipalARN)
+		log.Println("")
+		log.Println("Your new access key pair has been stored in the AWS configuration")
+		log.Printf("Note that it will expire at %v", awsCreds.Expires)
+		log.Println("To use this credential, call the AWS CLI with the --profile option (e.g. aws --profile", sharedCreds.Profile, "ec2 describe-instances).")
+	}
 	return nil
 }

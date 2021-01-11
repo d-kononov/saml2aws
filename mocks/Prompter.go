@@ -59,7 +59,7 @@ func (_m *Prompter) Password(_a0 string) string {
 }
 
 // RequestSecurityCode provides a mock function with given fields: _a0
-func (_m *Prompter) RequestSecurityCode(_a0 string) string {
+func (_m *Prompter) RequestSecurityCode(_a0 string, b bool) string {
 	ret := _m.Called(_a0)
 
 	var r0 string

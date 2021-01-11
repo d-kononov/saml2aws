@@ -102,7 +102,7 @@ func (ac *Client) Authenticate(loginDetails *creds.LoginDetails) (string, error)
 		case MFA_PROMPT:
 			otpForm := url.Values{}
 			if mfaToken == "" {
-				mfaToken = prompter.RequestSecurityCode("000000")
+				mfaToken = prompter.RequestSecurityCode("000000", false)
 			}
 
 			doc.Find("input").Each(func(i int, s *goquery.Selection) {

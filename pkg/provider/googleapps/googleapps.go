@@ -372,7 +372,7 @@ func (kc *Client) loadChallengePage(submitURL string, referer string, authForm u
 
 			var token = loginDetails.MFAToken
 			if token == "" {
-				token = prompter.RequestSecurityCode("000000")
+				token = prompter.RequestSecurityCode("000000", false)
 			}
 
 			responseForm.Set("Pin", token)
@@ -435,7 +435,7 @@ func (kc *Client) loadChallengePage(submitURL string, referer string, authForm u
 
 		case strings.Contains(secondActionURL, "challenge/skotp/"): // handle one-time HOTP challenge
 			fmt.Println("Get a one-time code by visiting https://g.co/sc on another device where you can use your security key")
-			var token = prompter.RequestSecurityCode("000 000")
+			var token = prompter.RequestSecurityCode("000 000", false)
 
 			responseForm.Set("Pin", token)
 			responseForm.Set("TrustDevice", "on") // Don't ask again on this computer

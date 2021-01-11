@@ -3,8 +3,8 @@ package prompter
 import (
 	"errors"
 	"fmt"
-
 	survey "github.com/AlecAivazis/survey/v2"
+	"os"
 )
 
 // CliPrompter used to prompt for cli input
@@ -17,10 +17,14 @@ func NewCli() *CliPrompter {
 }
 
 // RequestSecurityCode request a security code to be entered by the user
-func (cli *CliPrompter) RequestSecurityCode(pattern string) string {
+func (cli *CliPrompter) RequestSecurityCode(pattern string, silentOutput bool) string {
 	token := ""
 	prompt := &survey.Input{
 		Message: fmt.Sprintf("Security Token [%s]", pattern),
+	}
+	if silentOutput {
+		survey.AskOne(prompt, &token, survey.WithStdio(os.Stdin, os.Stderr, os.Stderr), survey.WithValidator(survey.Required))
+		return token
 	}
 	survey.AskOne(prompt, &token, survey.WithValidator(survey.Required))
 	return token

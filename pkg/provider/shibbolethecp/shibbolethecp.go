@@ -100,7 +100,7 @@ func (c *Client) Authenticate(loginDetails *creds.LoginDetails) (string, error) 
 	// if user chose passcode, then optionally prompt for the token and set the SHIB_DUO_PASSCODE header
 	if c.idpAccount.MFA == "passcode" {
 		if loginDetails.MFAToken == "" {
-			req.Header.Set(SHIB_DUO_PASSCODE, prompter.RequestSecurityCode("000000"))
+			req.Header.Set(SHIB_DUO_PASSCODE, prompter.RequestSecurityCode("000000", false))
 		} else {
 			req.Header.Set(SHIB_DUO_PASSCODE, loginDetails.MFAToken)
 		}

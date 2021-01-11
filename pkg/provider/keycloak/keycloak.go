@@ -19,7 +19,8 @@ import (
 
 // Client wrapper around KeyCloak.
 type Client struct {
-	client *provider.HTTPClient
+	client       *provider.HTTPClient
+	silentOutput bool
 }
 
 // New create a new KeyCloakClient
@@ -33,7 +34,8 @@ func New(idpAccount *cfg.IDPAccount) (*Client, error) {
 	}
 
 	return &Client{
-		client: client,
+		client:       client,
+		silentOutput: idpAccount.SilentOutput,
 	}, nil
 }
 
@@ -136,7 +138,7 @@ func (kc *Client) postTotpForm(totpSubmitURL string, mfaToken string, doc *goque
 	otpForm := url.Values{}
 
 	if mfaToken == "" {
-		mfaToken = prompter.RequestSecurityCode("000000")
+		mfaToken = prompter.RequestSecurityCode("000000", kc.silentOutput)
 	}
 
 	doc.Find("input").Each(func(i int, s *goquery.Selection) {

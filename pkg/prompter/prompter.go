@@ -4,7 +4,7 @@ var defaultPrompter Prompter = NewCli()
 
 // Prompter handles prompting user for input
 type Prompter interface {
-	RequestSecurityCode(string) string
+	RequestSecurityCode(string, bool) string
 	ChooseWithDefault(string, string, []string) (string, error)
 	Choose(string, []string) int
 	StringRequired(string) string
@@ -18,8 +18,8 @@ func SetPrompter(prmpt Prompter) {
 }
 
 // RequestSecurityCode request a security code to be entered by the user
-func RequestSecurityCode(pattern string) string {
-	return defaultPrompter.RequestSecurityCode(pattern)
+func RequestSecurityCode(pattern string, silentOutput bool) string {
+	return defaultPrompter.RequestSecurityCode(pattern, silentOutput)
 }
 
 // ChooseWithDefault given the choice return the option selected with a default
