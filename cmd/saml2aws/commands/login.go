@@ -138,7 +138,7 @@ func Login(loginFlags *flags.LoginExecFlags) error {
 	if !loginFlags.CommonFlags.Silent {
 		log.Println("Selected role:", role.RoleARN)
 	}
-	awsCreds, err := loginToStsUsingRole(account, role, samlAssertion)
+	awsCreds, err := loginToStsUsingRole(account, role, samlAssertion, loginFlags)
 	if err != nil {
 		return errors.Wrap(err, "error logging into aws role using saml assertion")
 	}

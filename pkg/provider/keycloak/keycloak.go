@@ -22,8 +22,6 @@ type Client struct {
 	client       *provider.HTTPClient
 	silentOutput bool
 	provider.ValidateBase
-
-	client *provider.HTTPClient
 }
 
 // New create a new KeyCloakClient
@@ -68,9 +66,10 @@ func (kc *Client) Authenticate(loginDetails *creds.LoginDetails) (string, error)
 		if err != nil {
 			return "", errors.Wrap(err, "unable to locate IDP totp form submit URL")
 		}
+		totpCredentialId := extractCredentialId(doc)
 
 		println("Please input TOTP code and hit enter")
-		doc, err = kc.postTotpForm(totpSubmitURL, loginDetails.MFAToken, doc)
+		doc, err = kc.postTotpForm(totpSubmitURL, totpCredentialId, loginDetails.MFAToken, doc)
 		if err != nil {
 			return "", errors.Wrap(err, "error posting totp form")
 		}
@@ -136,7 +135,7 @@ func (kc *Client) postLoginForm(authSubmitURL string, authForm url.Values) ([]by
 	return data, nil
 }
 
-func (kc *Client) postTotpForm(totpSubmitURL string, mfaToken string, doc *goquery.Document) (*goquery.Document, error) {
+func (kc *Client) postTotpForm(totpSubmitURL string, totpCredentialId *string, mfaToken string, doc *goquery.Document) (*goquery.Document, error) {
 
 	otpForm := url.Values{}
 
@@ -147,6 +146,9 @@ func (kc *Client) postTotpForm(totpSubmitURL string, mfaToken string, doc *goque
 	doc.Find("input").Each(func(i int, s *goquery.Selection) {
 		updateOTPFormData(otpForm, s, mfaToken)
 	})
+	if totpCredentialId != nil {
+		otpForm.Add("selectedCredentialId", *totpCredentialId)
+	}
 
 	req, err := http.NewRequest("POST", totpSubmitURL, strings.NewReader(otpForm.Encode()))
 	if err != nil {
@@ -164,6 +166,7 @@ func (kc *Client) postTotpForm(totpSubmitURL string, mfaToken string, doc *goque
 	if err != nil {
 		return nil, errors.Wrap(err, "error reading totp form response")
 	}
+	log.Println(doc.Html())
 
 	return doc, nil
 }
@@ -185,6 +188,20 @@ func extractSubmitURL(doc *goquery.Document) (string, error) {
 	}
 
 	return submitURL, nil
+}
+
+func extractCredentialId(doc *goquery.Document) (credId *string) {
+	doc.Find(".form-group").Each(func(i int, s *goquery.Selection) {
+		if s.Find(".otp-tile").Length() > 0 {
+			credIdValue, ok := s.Find("input[type='hidden']").Last().Attr("value")
+			if !ok {
+				return
+			}
+			credId = &credIdValue
+			return
+		}
+	})
+	return credId
 }
 
 func extractSamlResponse(doc *goquery.Document) string {

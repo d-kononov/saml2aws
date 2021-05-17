@@ -23,7 +23,7 @@ func (cli *CliPrompter) RequestSecurityCode(pattern string, silentOutput bool) s
 		Message: fmt.Sprintf("Security Token [%s]", pattern),
 	}
 	if silentOutput {
-		_ = survey.AskOne(prompt, &token, survey.WithStdio(os.Stdin, os.Stderr, os.Stderr), survey.WithValidator(survey.Required))
+		_ = survey.AskOne(prompt, &token, survey.WithValidator(survey.Required))
 		return token
 	}
 	_ = survey.AskOne(prompt, &token, survey.WithValidator(survey.Required))
