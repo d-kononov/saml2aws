@@ -166,7 +166,6 @@ func (kc *Client) postTotpForm(totpSubmitURL string, totpCredentialId *string, m
 	if err != nil {
 		return nil, errors.Wrap(err, "error reading totp form response")
 	}
-	log.Println(doc.Html())
 
 	return doc, nil
 }
