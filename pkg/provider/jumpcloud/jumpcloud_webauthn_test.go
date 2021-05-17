@@ -1,4 +1,4 @@
-package googleapps
+package jumpcloud
 
 import (
 	"testing"
@@ -21,11 +21,11 @@ func (m *MockDeviceFinder) findDevice() (u2fhost.Device, error) {
 	return m.device, nil
 }
 
-func TestNewU2FClient(t *testing.T) {
+func TestNewFidoClient(t *testing.T) {
 	challengeNonce := "challengeNonce"
-	appID := "appID"
-	version := "version"
+	rpId := "rpId"
 	keyHandle := "keyHandle"
+	token := "token"
 	tests := []fidoClientTests{
 		{
 			title: "Returns new client successfully if device found",
@@ -35,7 +35,7 @@ func TestNewU2FClient(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.title, func(t *testing.T) {
-			_, err := NewU2FClient(challengeNonce, appID, version, keyHandle, &MockDeviceFinder{&mocks.U2FDevice{}})
+			_, err := NewFidoClient(challengeNonce, rpId, keyHandle, token, &MockDeviceFinder{&mocks.U2FDevice{}})
 			if test.err != nil {
 				assert.NotNil(t, err)
 				assert.Equal(t, test.err.Error(), err.Error())
@@ -45,10 +45,10 @@ func TestNewU2FClient(t *testing.T) {
 }
 
 func TestChallengeU2F(t *testing.T) {
-	challengeNonce := "dGVzdAo="
-	appID := "appID"
-	facet := "facet"
-	keyHandle := "dGVzdAo="
+	challengeNonce := "challengeNonce"
+	rpId := "rpId"
+	keyHandle := "keyHandle"
+	token := "token"
 	tests := []fidoClientTests{
 		{
 			title: "Returns signed assertion from device",
@@ -62,19 +62,19 @@ func TestChallengeU2F(t *testing.T) {
 			mockDeviceFinder := &MockDeviceFinder{device}
 			device.On("Open").Return(nil)
 			request := &u2fhost.AuthenticateRequest{
-				Challenge:          "dGVzdAo",
-				AppId:              appID,
-				Facet:              facet,
-				KeyHandle:          "dGVzdAo",
+				Challenge:          challengeNonce,
+				AppId:              rpId,
+				Facet:              jumpCloudOrigin,
+				KeyHandle:          keyHandle,
 				ChannelIdPublicKey: nil,
 				ChannelIdUnused:    false,
 				CheckOnly:          false,
-				WebAuthn:           false,
+				WebAuthn:           true,
 			}
 			response := &u2fhost.AuthenticateResponse{}
 			device.On("Authenticate", request).Return(response, nil)
 			device.On("Close").Return(nil)
-			client, _ := NewU2FClient(challengeNonce, appID, facet, keyHandle, mockDeviceFinder)
+			client, _ := NewFidoClient(challengeNonce, rpId, keyHandle, token, mockDeviceFinder)
 			_, err := client.ChallengeU2F()
 			if test.err != nil {
 				assert.NotNil(t, err)

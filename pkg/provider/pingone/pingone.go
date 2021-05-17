@@ -24,6 +24,8 @@ var logger = logrus.WithField("provider", "pingone")
 
 // Client wrapper around PingOne + PingId enabling authentication and retrieval of assertions
 type Client struct {
+	provider.ValidateBase
+
 	client     *provider.HTTPClient
 	idpAccount *cfg.IDPAccount
 }
@@ -34,10 +36,10 @@ func SuccessOrRedirectOrUnauthorizedResponseValidator(req *http.Request, resp *h
 	validatorResponse := provider.SuccessOrRedirectResponseValidator(req, resp)
 
 	if validatorResponse == nil || resp.StatusCode == 401 {
-		return nil;
+		return nil
 	}
 
-	return validatorResponse;
+	return validatorResponse
 }
 
 // New create a new PingOne client
@@ -78,14 +80,14 @@ func (ac *Client) follow(ctx context.Context, req *http.Request) (string, error)
 		return "", errors.Wrap(err, "error following")
 	}
 
-	doc, err := goquery.NewDocumentFromResponse(res)
+	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to build document from response")
 	}
 
 	var handler func(context.Context, *goquery.Document, *http.Response) (context.Context, *http.Request, error)
 
-	if docIsFormRedirectToAWS(doc) {
+	if docIsFormRedirectToTarget(doc, ac.idpAccount.TargetURL) {
 		logger.WithField("type", "saml-response-to-aws").Debug("doc detect")
 		if samlResponse, ok := extractSAMLResponse(doc); ok {
 			decodedSamlResponse, err := base64.StdEncoding.DecodeString(samlResponse)
@@ -243,15 +245,6 @@ func (ac *Client) handleFormRedirect(ctx context.Context, doc *goquery.Document,
 	return ctx, req, err
 }
 
-func (ac *Client) handleFormSamlRequest(ctx context.Context, doc *goquery.Document, _ *http.Response) (context.Context, *http.Request, error) {
-	form, err := page.NewFormFromDocument(doc, "")
-	if err != nil {
-		return ctx, nil, errors.Wrap(err, "error extracting samlrequest form")
-	}
-	req, err := form.BuildRequest()
-	return ctx, req, err
-}
-
 func (ac *Client) handleRefresh(ctx context.Context, doc *goquery.Document, _ *http.Response) (context.Context, *http.Request, error) {
 	loginDetails, ok := ctx.Value(ctxKey("login")).(*creds.LoginDetails)
 	if !ok {
@@ -325,8 +318,12 @@ func docIsFormResume(doc *goquery.Document) bool {
 	return doc.Find("input[name=\"RelayState\"]").Size() == 1 || doc.Find("input[name=\"Resume\"]").Size() == 1
 }
 
-func docIsFormRedirectToAWS(doc *goquery.Document) bool {
-	return doc.Find("form[action=\"https://signin.aws.amazon.com/saml\"]").Size() == 1
+func docIsFormRedirectToTarget(doc *goquery.Document, target string) bool {
+	if target == "" {
+		target = "https://signin.aws.amazon.com/saml"
+	}
+	urlForm := fmt.Sprintf("form[action=\"%s\"]", target)
+	return doc.Find(urlForm).Size() == 1
 }
 
 func docIsFormSelectDevice(doc *goquery.Document) bool {

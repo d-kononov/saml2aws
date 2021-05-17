@@ -21,6 +21,9 @@ import (
 type Client struct {
 	client       *provider.HTTPClient
 	silentOutput bool
+	provider.ValidateBase
+
+	client *provider.HTTPClient
 }
 
 // New create a new KeyCloakClient
@@ -83,7 +86,7 @@ func (kc *Client) getLoginForm(loginDetails *creds.LoginDetails) (string, url.Va
 		return "", nil, errors.Wrap(err, "error retrieving form")
 	}
 
-	doc, err := goquery.NewDocumentFromResponse(res)
+	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
 		return "", nil, errors.Wrap(err, "failed to build document from response")
 	}
@@ -157,7 +160,7 @@ func (kc *Client) postTotpForm(totpSubmitURL string, mfaToken string, doc *goque
 		return nil, errors.Wrap(err, "error retrieving content")
 	}
 
-	doc, err = goquery.NewDocumentFromResponse(res)
+	doc, err = goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
 		return nil, errors.Wrap(err, "error reading totp form response")
 	}
@@ -216,11 +219,7 @@ func containsTotpForm(doc *goquery.Document) bool {
 	// search otp field at Keycloak >= 8.0.1
 	totpIndex = doc.Find("input#otp").Index()
 
-	if totpIndex != -1 {
-		return true
-	}
-
-	return false
+	return totpIndex != -1
 }
 
 func updateKeyCloakFormData(authForm url.Values, s *goquery.Selection, user *creds.LoginDetails) {
