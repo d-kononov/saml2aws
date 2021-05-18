@@ -9,9 +9,9 @@ import (
 	"runtime"
 
 	"github.com/alecthomas/kingpin"
+	"github.com/d-kononov/saml2aws/v2/cmd/saml2aws/commands"
+	"github.com/d-kononov/saml2aws/v2/pkg/flags"
 	"github.com/sirupsen/logrus"
-	"github.com/versent/saml2aws/v2/cmd/saml2aws/commands"
-	"github.com/versent/saml2aws/v2/pkg/flags"
 )
 
 var (

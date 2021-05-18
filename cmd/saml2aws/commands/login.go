@@ -11,15 +11,15 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sts"
+	"github.com/d-kononov/saml2aws/v2"
+	"github.com/d-kononov/saml2aws/v2/helper/credentials"
+	"github.com/d-kononov/saml2aws/v2/pkg/awsconfig"
+	"github.com/d-kononov/saml2aws/v2/pkg/cfg"
+	"github.com/d-kononov/saml2aws/v2/pkg/creds"
+	"github.com/d-kononov/saml2aws/v2/pkg/flags"
+	"github.com/d-kononov/saml2aws/v2/pkg/samlcache"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/versent/saml2aws/v2"
-	"github.com/versent/saml2aws/v2/helper/credentials"
-	"github.com/versent/saml2aws/v2/pkg/awsconfig"
-	"github.com/versent/saml2aws/v2/pkg/cfg"
-	"github.com/versent/saml2aws/v2/pkg/creds"
-	"github.com/versent/saml2aws/v2/pkg/flags"
-	"github.com/versent/saml2aws/v2/pkg/samlcache"
 )
 
 // Login login to ADFS

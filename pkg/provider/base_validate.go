@@ -3,7 +3,7 @@ package provider
 import (
 	"errors"
 
-	"github.com/versent/saml2aws/v2/pkg/creds"
+	"github.com/d-kononov/saml2aws/v2/pkg/creds"
 )
 
 type ValidateBase struct {

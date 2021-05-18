@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/d-kononov/saml2aws/v2/pkg/creds"
 	"github.com/pkg/errors"
-	"github.com/versent/saml2aws/v2/pkg/creds"
 )
 
 func (ac *Client) authenticateNTLM(loginDetails *creds.LoginDetails) (string, error) {

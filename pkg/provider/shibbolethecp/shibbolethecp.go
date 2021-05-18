@@ -13,13 +13,13 @@ import (
 	"time"
 
 	"github.com/beevik/etree"
+	"github.com/d-kononov/saml2aws/v2/pkg/cfg"
+	"github.com/d-kononov/saml2aws/v2/pkg/creds"
+	"github.com/d-kononov/saml2aws/v2/pkg/prompter"
+	"github.com/d-kononov/saml2aws/v2/pkg/provider"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/versent/saml2aws/v2/pkg/cfg"
-	"github.com/versent/saml2aws/v2/pkg/creds"
-	"github.com/versent/saml2aws/v2/pkg/prompter"
-	"github.com/versent/saml2aws/v2/pkg/provider"
 )
 
 const SAML_SUCCESS = "urn:oasis:names:tc:SAML:2.0:status:Success"
@@ -37,14 +37,14 @@ type Client struct {
 var logger = logrus.WithField("provider", "shibbolethecp")
 
 const authnRequestTpl = `
-<S:Envelope 
+<S:Envelope
     xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion"
-    xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol" 
+    xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol"
     xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
     xmlns:ecp="urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp">
-    <S:Body> 
+    <S:Body>
         <saml2p:AuthnRequest
-		ID="{{.ID}}" 
+		ID="{{.ID}}"
 		ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:PAOS"
 		AssertionConsumerServiceURL="{{.AssertionConsumerServiceURL}}"
 		IssueInstant="{{.IssueInstant}}"
@@ -52,8 +52,8 @@ const authnRequestTpl = `
 			<saml2:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
 				{{.EntityID}}
 			</saml2:Issuer>
-		</saml2p:AuthnRequest>       
-     </S:Body> 
+		</saml2p:AuthnRequest>
+     </S:Body>
 </S:Envelope>`
 
 type authnRequestData struct {

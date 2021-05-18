@@ -7,8 +7,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/versent/saml2aws/v2/pkg/cfg"
-	"github.com/versent/saml2aws/v2/pkg/creds"
+	"github.com/d-kononov/saml2aws/v2/pkg/cfg"
+	"github.com/d-kononov/saml2aws/v2/pkg/creds"
 )
 
 var logger = logrus.WithField("provider", "shell")

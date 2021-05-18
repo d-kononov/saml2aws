@@ -6,12 +6,12 @@ import (
 	"log"
 	"os"
 
+	"github.com/d-kononov/saml2aws/v2"
+	"github.com/d-kononov/saml2aws/v2/helper/credentials"
+	"github.com/d-kononov/saml2aws/v2/pkg/flags"
+	"github.com/d-kononov/saml2aws/v2/pkg/samlcache"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/versent/saml2aws/v2"
-	"github.com/versent/saml2aws/v2/helper/credentials"
-	"github.com/versent/saml2aws/v2/pkg/flags"
-	"github.com/versent/saml2aws/v2/pkg/samlcache"
 )
 
 // ListRoles will list available role ARNs

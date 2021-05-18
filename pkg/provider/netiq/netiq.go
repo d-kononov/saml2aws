@@ -8,13 +8,13 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/d-kononov/saml2aws/v2/pkg/cfg"
+	"github.com/d-kononov/saml2aws/v2/pkg/creds"
+	"github.com/d-kononov/saml2aws/v2/pkg/page"
+	"github.com/d-kononov/saml2aws/v2/pkg/prompter"
+	"github.com/d-kononov/saml2aws/v2/pkg/provider"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/versent/saml2aws/v2/pkg/cfg"
-	"github.com/versent/saml2aws/v2/pkg/creds"
-	"github.com/versent/saml2aws/v2/pkg/page"
-	"github.com/versent/saml2aws/v2/pkg/prompter"
-	"github.com/versent/saml2aws/v2/pkg/provider"
 )
 
 var logger = logrus.WithField("provider", "NetIQ")

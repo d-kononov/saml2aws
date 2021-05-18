@@ -6,9 +6,9 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/d-kononov/saml2aws/v2/helper/credentials"
 	"github.com/keybase/go-keychain"
 	"github.com/sirupsen/logrus"
-	"github.com/versent/saml2aws/v2/helper/credentials"
 )
 
 var logger = logrus.WithField("helper", "osxkeychain")
