@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -75,7 +74,7 @@ func (kc *Client) Authenticate(loginDetails *creds.LoginDetails) (string, error)
 		}
 	}
 
-	return extractSamlResponse(doc), nil
+	return extractSamlResponse(doc)
 }
 
 func (kc *Client) getLoginForm(loginDetails *creds.LoginDetails) (string, url.Values, error) {
@@ -203,25 +202,29 @@ func extractCredentialId(doc *goquery.Document) (credId *string) {
 	return credId
 }
 
-func extractSamlResponse(doc *goquery.Document) string {
+func extractSamlResponse(doc *goquery.Document) (string, error) {
 	var samlAssertion string
+	var err error
 
 	doc.Find("input").Each(func(i int, s *goquery.Selection) {
 		name, ok := s.Attr("name")
 		if ok && name == "SAMLResponse" {
 			val, ok := s.Attr("value")
 			if !ok {
-				log.Fatalf("unable to locate saml assertion value")
+				err = errors.New("unable to locate saml assertion value")
 			}
 			samlAssertion = val
 		}
 	})
-
-	if samlAssertion == "" {
-		log.Fatalf("unable to locate saml response field")
+	if err != nil {
+		return "", errors.New("unable to locate saml assertion value")
 	}
 
-	return samlAssertion
+	if samlAssertion == "" {
+		return "", errors.New("unable to locate saml response field")
+	}
+
+	return samlAssertion, nil
 }
 
 func containsTotpForm(doc *goquery.Document) bool {
