@@ -59,7 +59,11 @@ func (kc *Client) Authenticate(loginDetails *creds.LoginDetails) (string, error)
 	if err != nil {
 		return "", errors.Wrap(err, "error parsing document")
 	}
-
+	if credErr := doc.Find("#input-error"); credErr.Length() > 0 {
+		if err := credErr.First().Text(); err != "" {
+			return "", errors.Wrap(errors.New(strings.TrimSpace(err)), "Auth failed")
+		}
+	}
 	if containsTotpForm(doc) {
 		totpSubmitURL, err := extractSubmitURL(doc)
 		if err != nil {
@@ -67,8 +71,15 @@ func (kc *Client) Authenticate(loginDetails *creds.LoginDetails) (string, error)
 		}
 		totpCredentialId := extractCredentialId(doc)
 
-		println("Please input TOTP code and hit enter")
+		if loginDetails.MFAToken == "" {
+			println("Please input TOTP code and hit enter")
+		}
 		doc, err = kc.postTotpForm(totpSubmitURL, totpCredentialId, loginDetails.MFAToken, doc)
+		if otpErr := doc.Find("#input-error-otp-code"); otpErr.Length() > 0 {
+			if err := otpErr.First().Text(); err != "" {
+				return "", errors.Wrap(errors.New(strings.TrimSpace(err)), "Auth failed")
+			}
+		}
 		if err != nil {
 			return "", errors.Wrap(err, "error posting totp form")
 		}
