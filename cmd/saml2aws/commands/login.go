@@ -181,6 +181,9 @@ func resolveLoginDetails(account *cfg.IDPAccount, loginFlags *flags.LoginExecFla
 
 	loginDetails := &creds.LoginDetails{URL: account.URL, Username: account.Username, MFAToken: loginFlags.CommonFlags.MFAToken, DuoMFAOption: loginFlags.DuoMFAOption}
 
+	if account.Password != "" {
+		loginDetails.Password = account.Password
+	}
 	if !loginFlags.CommonFlags.Silent {
 		log.Printf("Using IDP Account %s to access %s %s", loginFlags.CommonFlags.IdpAccount, account.Provider, account.URL)
 	}

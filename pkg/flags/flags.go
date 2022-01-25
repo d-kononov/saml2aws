@@ -62,6 +62,10 @@ func ApplyFlagOverrides(commonFlags *CommonFlags, account *cfg.IDPAccount) {
 		account.Username = commonFlags.Username
 	}
 
+	if commonFlags.Password != "" {
+		account.Password = commonFlags.Password
+	}
+
 	if commonFlags.SkipVerify {
 		account.SkipVerify = commonFlags.SkipVerify
 	}

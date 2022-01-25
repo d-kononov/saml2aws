@@ -34,6 +34,7 @@ type IDPAccount struct {
 	AppID                string `ini:"app_id"` // used by OneLogin and AzureAD
 	URL                  string `ini:"url"`
 	Username             string `ini:"username"`
+	Password             string `ini:"password"`
 	Provider             string `ini:"provider"`
 	MFA                  string `ini:"mfa"`
 	SkipVerify           bool   `ini:"skip_verify"`
