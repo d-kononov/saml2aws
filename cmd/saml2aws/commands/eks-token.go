@@ -87,7 +87,7 @@ func EksToken(configFlags *flags.LoginExecFlags) error {
 
 	tokenOutput := &tokenOutput{
 		Kind:       "ExecCredential",
-		ApiVersion: "client.authentication.k8s.io/v1alpha1",
+		ApiVersion: "client.authentication.k8s.io/v1",
 		Status: struct {
 			ExpirationTimestamp string `json:"expirationTimestamp"`
 			Token               string `json:"token"`

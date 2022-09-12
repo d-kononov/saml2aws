@@ -450,11 +450,11 @@ To use this you will need to export `AWS_DEFAULT_PROFILE=customer-test` environm
 
 ### Using `saml2aws` as [credential plugin](https://kubernetes.io/docs/reference/access-authn-authz/authentication/#client-go-credential-plugins) for kubectl
 
-Edit kubectl config (`~/kube.config`), replace exec command by:
+Edit kubectl config (`~/.kube/config`), replace exec command by:
 
 ```bash
     exec:
-      apiVersion: client.authentication.k8s.io/v1alpha1
+      apiVersion: client.authentication.k8s.io/v1beta1
       args:
       - eks-token
       - --cluster-name
