@@ -9,7 +9,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.8.0
 	github.com/alecthomas/kingpin v2.2.6+incompatible
 	github.com/avast/retry-go v3.0.0+incompatible
-	github.com/aws/aws-sdk-go v1.44.59
+	github.com/aws/aws-sdk-go v1.44.107
 	github.com/beevik/etree v1.1.0
 	github.com/danieljoos/wincred v1.1.2
 	github.com/google/uuid v1.3.0
@@ -24,7 +24,7 @@ require (
 	github.com/tidwall/gjson v1.14.1
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd
 	gopkg.in/ini.v1 v1.66.6
-	sigs.k8s.io/aws-iam-authenticator v0.5.9
+	sigs.k8s.io/aws-iam-authenticator v0.5.10
 )
 
 require (
